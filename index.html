@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Register & Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h2 {
+        color: #333;
+      }
+
+      .form-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 900px;
+      }
+
+      .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        box-sizing: border-box;
+      }
+
+      input {
+        margin: 10px 0;
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 10px 15px;
+        background-color: #4caf50;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .clear-btn {
+        background-color: #f44336;
+      }
+
+      .clear-btn:hover {
+        background-color: #d32f2f;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .user-list {
+        background: #fff;
+        padding: 20px;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+      }
+
+      .user-list h3 {
+        margin-top: 0;
+      }
+
+      .user-item {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      @media (max-width: 600px) {
+        .card {
+          width: 100%;
+          padding: 20px;
+        }
+
+        .form-wrapper {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-wrapper">
+      <div class="card">
+        <h2>REGISTER</h2>
+        <div id="register-form">
+          <input type="text" id="fullname" placeholder="Full Name" />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="tel" id="phone" placeholder="Phone Number" />
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+            minlength="8"
+            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*"
+            title="Must have lowercase, uppercase, and a number"
+          />
+          <input type="date" id="dob" placeholder="Date of Birth" />
+          <button onclick="registerUser()">Register</button>
+          <button class="clear-btn" onclick="clearRegisterForm()">Clear</button>
+          <p id="register-msg"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>LOGIN</h2>
+        <div id="login-form">
+          <input type="email" id="login-email" placeholder="Email" />
+          <input type="password" id="login-password" placeholder="Password" />
+          <button onclick="loginUser()">Login</button>
+          <button class="clear-btn" onclick="clearLoginForm()">Clear</button>
+          <p id="login-msg"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="user-list" id="user-list" style="display: none">
+      <h3>Registered Users</h3>
+      <div id="user-entries"></div>
+    </div>
+
+    <footer>
+        <a href="https://github.com/Ivenkili/register.git"> My GitHub repo</a>
+    </footer>
+
+    <script>
+      let registeredUsers = [];
+
+      function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function validatePassword(password) {
+        return (
+          /[a-z]/.test(password) &&
+          /[A-Z]/.test(password) &&
+          /\d/.test(password) &&
+          password.length > 7
+        );
+      }
+
+      function calculateAge(dob) {
+        const dobDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - dobDate.getFullYear();
+        const m = today.getMonth() - dobDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+          age--;
+        }
+        return age;
+      }
+
+      function registerUser() {
+        const fullname = document.getElementById("fullname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const password = document.getElementById("password").value;
+        const dob = document.getElementById("dob").value;
+        const msg = document.getElementById("register-msg");
+
+        if (!fullname || !email || !phone || !password || !dob) {
+          msg.textContent = "All fields are required!";
+          msg.style.color = "red";
+          return;
+        }
+
+        if (!validateEmail(email)) {
+          msg.textContent = "Invalid email address!";
+          msg.style.color = "red";
+          return;
+        }
+
+        if (!validatePassword(password)) {
+          msg.textContent =
+            "Password must be >7 chars, with lowercase, uppercase, number.";
+          msg.style.color = "red";
+          return;
+        }
+
+        if (calculateAge(dob) < 18) {
+          msg.textContent = "You must be 18 or older.";
+          msg.style.color = "red";
+          return;
+        }
+
+        const emailExists = registeredUsers.some(
+          (user) => user.email === email
+        );
+        if (emailExists) {
+          msg.textContent = "This email is already registered.";
+          msg.style.color = "red";
+          return;
+        }
+
+        registeredUsers.push({ fullname, email, phone, password, dob });
+
+        msg.innerHTML = `<strong>Registration successful!</strong><br>Welcome, ${fullname}.`;
+        msg.style.color = "green";
+
+        updateUserList();
+        clearRegisterForm();
+      }
+
+      function loginUser() {
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+        const msg = document.getElementById("login-msg");
+
+        if (!email || !password) {
+          msg.textContent = "Please enter both email and password.";
+          msg.style.color = "red";
+          return;
+        }
+
+        const foundUser = registeredUsers.find(
+          (user) => user.email === email && user.password === password
+        );
+
+        if (foundUser) {
+          msg.textContent = `Login successful! Welcome, ${foundUser.fullname}.`;
+          msg.style.color = "green";
+        } else {
+          msg.textContent = "Invalid email or password.";
+          msg.style.color = "red";
+        }
+      }
+
+      function clearRegisterForm() {
+        document.getElementById("fullname").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("dob").value = "";
+        document.getElementById("register-msg").textContent = "";
+      }
+
+      function clearLoginForm() {
+        document.getElementById("login-email").value = "";
+        document.getElementById("login-password").value = "";
+        document.getElementById("login-msg").textContent = "";
+      }
+
+      function updateUserList() {
+        const container = document.getElementById("user-entries");
+        const listWrapper = document.getElementById("user-list");
+        listWrapper.style.display = "block";
+
+        container.innerHTML = "";
+        registeredUsers.forEach((user) => {
+          const entry = document.createElement("div");
+          entry.className = "user-item";
+          entry.innerHTML = `
+            <strong>${user.fullname}</strong><br>
+            Email: ${user.email}<br>
+            Phone: ${user.phone}<br>
+            DOB: ${user.dob}
+          `;
+          container.appendChild(entry);
+        });
+      }
+    </script>
+  </body>
+</html>
