@@ -97,6 +97,17 @@
         padding-bottom: 10px;
         border-bottom: 1px solid #eee;
       }
+      @media (max-width: 600px) {
+        .card {
+          width: 100%;
+          padding: 20px;
+        }
+
+        .form-wrapper {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
     </style>
   </head>
   <body>
@@ -106,7 +117,6 @@
         <div id="register-form">
           <input type="text" id="fullname" placeholder="Full Name" />
           <input type="email" id="email" placeholder="Email" required />
-
           <input type="tel" id="phone" placeholder="Phone Number" />
           <input
             type="password"
@@ -117,7 +127,6 @@
             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*"
             title="Must have lowercase, uppercase, and a number"
           />
-
           <input type="date" id="dob" placeholder="Date of Birth" />
           <button onclick="registerUser()">Register</button>
           <button class="clear-btn" onclick="clearRegisterForm()">Clear</button>
@@ -145,31 +154,28 @@
     <script>
       let registeredUsers = [];
 
-      if (!validateEmail(email)) {
-        msg.textContent = "Invalid email address!";
-        msg.style.color = "red";
-        return;
+      function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
-      //   function validatePassword(password) {
-      //     return (
-      //       /[a-z]/.test(password) &&
-      //       /[A-Z]/.test(password) &&
-      //       /\d/.test(password) &&
-      //       password.length > 7
-      //     );
-      //   }
+      function validatePassword(password) {
+        return (
+          /[a-z]/.test(password) &&
+          /[A-Z]/.test(password) &&
+          /\d/.test(password) &&
+          password.length > 7
+        );
+      }
 
-      const dobDate = new Date(dob);
-      const today = new Date();
-      let age = today.getFullYear() - dobDate.getFullYear();
-      const m = today.getMonth() - dobDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) age--;
-
-      if (age < 18) {
-        msg.textContent = "You must be at least 18.";
-        msg.style.color = "red";
-        return;
+      function calculateAge(dob) {
+        const dobDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - dobDate.getFullYear();
+        const m = today.getMonth() - dobDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+          age--;
+        }
+        return age;
       }
 
       function registerUser() {
@@ -215,6 +221,7 @@
         }
 
         registeredUsers.push({ fullname, email, phone, password, dob });
+
         msg.innerHTML = `<strong>Registration successful!</strong><br>Welcome, ${fullname}.`;
         msg.style.color = "green";
 
@@ -271,11 +278,11 @@
           const entry = document.createElement("div");
           entry.className = "user-item";
           entry.innerHTML = `
-          <strong>${user.fullname}</strong><br>
-          Email: ${user.email}<br>
-          Phone: ${user.phone}<br>
-          DOB: ${user.dob}
-        `;
+            <strong>${user.fullname}</strong><br>
+            Email: ${user.email}<br>
+            Phone: ${user.phone}<br>
+            DOB: ${user.dob}
+          `;
           container.appendChild(entry);
         });
       }
